@@ -2,35 +2,46 @@ package main
 
 import (
 	"encoding/csv"
-	"flag"
 	"fmt"
 	"log"
 	"os"
+	"strings"
+
+	"github.com/spf13/cobra"
 )
 
 func main() {
+	var rootCmd = &cobra.Command{Use: "dealership-cli"}
+
 	cars, err := readCSV("ProcimoChallenge_Backend_Dealership.csv")
 
 	if err != nil {
 		log.Fatalln("arst", err)
 	}
 
-	// Define flags
-	brandPtr := flag.String("brand", "hello", "a string")
+	var brand string
 
-	// Parse flags
-	flag.Parse()
+	numberOfCarsByBrand := &cobra.Command{
+		Use:   "filter",
+		Short: "Get the number of cars by the brand",
+		Run: func(cmd *cobra.Command, args []string) {
+			if brand == "" {
+				fmt.Println("The brand cannot be empty!")
+				return
+			}
 
-	// Access flag values
-	fmt.Println("brand:", *brandPtr)
+			uppercasedBrand := strings.ToUpper(brand)
 
-	carsByBrand := getCarsByBrand(*brandPtr, cars)
+			filteredCars := getCarsByBrand(uppercasedBrand, cars)
 
-	for _, car := range carsByBrand {
-		fmt.Printf("%+v", car)
+			fmt.Printf("Number of %s cars: %d", uppercasedBrand, len(filteredCars))
+		},
 	}
 
-	fmt.Printf("Number of %s cars: %d", *brandPtr, len(carsByBrand))
+	numberOfCarsByBrand.Flags().StringVarP(&brand, "brand", "b", "", "Get the number of cars by brand")
+
+	rootCmd.AddCommand(numberOfCarsByBrand)
+	rootCmd.Execute()
 }
 
 type Car struct {
