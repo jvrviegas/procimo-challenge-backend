@@ -52,9 +52,7 @@ func main() {
 
 			filteredCars := getCarsByBrand(uppercasedBrand, cars)
 
-			for _, car := range filteredCars {
-				printCar(car)
-			}
+			printCarsList(filteredCars)
 		},
 	}
 
