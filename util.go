@@ -32,3 +32,9 @@ func printCar(car Car) {
 		fmt.Printf("%s \t | %s \t | %d \t | %d | \n", car.Brand, car.Dealership, car.Kilometers, car.Price)
 	}
 }
+
+func printCarsList(cars []Car) {
+	for _, car := range cars {
+		printCar(car)
+	}
+}
