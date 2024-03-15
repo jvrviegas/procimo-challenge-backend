@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"text/tabwriter"
+)
 
 func getUniqueBrands(cars []Car) []string {
 	uniqueBrand := make(map[string]bool)
@@ -25,16 +29,14 @@ func listUniqueBrands(cars []Car) {
 	}
 }
 
-func printCar(car Car) {
-	if len(car.Dealership) <= 10 {
-		fmt.Printf("%s \t | %s \t\t | %d \t | %d | \n", car.Brand, car.Dealership, car.Kilometers, car.Price)
-	} else {
-		fmt.Printf("%s \t | %s \t | %d \t | %d | \n", car.Brand, car.Dealership, car.Kilometers, car.Price)
-	}
-}
-
 func printCarsList(cars []Car) {
-	for _, car := range cars {
-		printCar(car)
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+	fmt.Fprintln(w, "Brand\t| Dealership \t| Kilometers \t| Price")
+	fmt.Fprintln(w, "------\t-------------\t--------------\t-------")
+
+	for _, c := range cars {
+		fmt.Fprintf(w, "%s\t| %s\t| %d\t | %d\n", c.Brand, c.Dealership, c.Kilometers, c.Price)
 	}
+
+	w.Flush()
 }
