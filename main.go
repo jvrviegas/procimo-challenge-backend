@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -38,17 +39,46 @@ func main() {
 		},
 	}
 
+	listCarsByBrand := &cobra.Command{
+		Use:   "list",
+		Short: "List the cars by brand",
+		Run: func(cmd *cobra.Command, args []string) {
+			if brand == "" {
+				fmt.Println("The brand cannot be empty!")
+				return
+			}
+
+			uppercasedBrand := strings.ToUpper(brand)
+
+			filteredCars := getCarsByBrand(uppercasedBrand, cars)
+
+			for _, car := range filteredCars {
+				printCar(car)
+			}
+		},
+	}
+
 	numberOfCarsByBrand.Flags().StringVarP(&brand, "brand", "b", "", "Get the number of cars by brand")
+	listCarsByBrand.Flags().StringVarP(&brand, "brand", "b", "", "List the cars by brand")
 
 	rootCmd.AddCommand(numberOfCarsByBrand)
+	rootCmd.AddCommand(listCarsByBrand)
 	rootCmd.Execute()
 }
 
 type Car struct {
 	Brand      string `json:"brand"`
 	Dealership string `json:"dealership"`
-	Kilometers string `json:"kilometers"`
-	Price      string `json:"price"`
+	Kilometers int    `json:"kilometers"`
+	Price      int    `json:"price"`
+}
+
+func printCar(car Car) {
+	if len(car.Dealership) <= 10 {
+		fmt.Printf("%s \t | %s \t\t | %d \t | %d | \n", car.Brand, car.Dealership, car.Kilometers, car.Price)
+	} else {
+		fmt.Printf("%s \t | %s \t | %d \t | %d | \n", car.Brand, car.Dealership, car.Kilometers, car.Price)
+	}
 }
 
 func readCSV(filename string) ([]Car, error) {
@@ -72,7 +102,9 @@ func readCSV(filename string) ([]Car, error) {
 	var jsonData []Car
 
 	for _, record := range records {
-		data := Car{Brand: record[0], Dealership: record[1], Kilometers: record[2], Price: record[3]}
+		kilometers, _ := strconv.Atoi(record[2])
+		price, _ := strconv.Atoi(record[3])
+		data := Car{Brand: record[0], Dealership: record[1], Kilometers: kilometers, Price: price}
 
 		jsonData = append(jsonData, data)
 	}
