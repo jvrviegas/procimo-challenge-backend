@@ -20,7 +20,7 @@ func main() {
 		log.Fatalln("arst", err)
 	}
 
-	var brand string
+	var brand, dealership string
 	var min, max int
 
 	numberOfCarsByBrand := &cobra.Command{
@@ -72,14 +72,31 @@ func main() {
 		},
 	}
 
+	getDealershipTotalAmount := &cobra.Command{
+		Use:   "total",
+		Short: "Get the total amount of a dealership",
+		Run: func(cmd *cobra.Command, args []string) {
+			if dealership == "" {
+				fmt.Println("The dealership cannot be empty!")
+				return
+			}
+
+			totalAmount := getTotalPriceByDealership(dealership, cars)
+
+			fmt.Printf("Total amount of %s cars: %s\n", dealership, formatCurrency(totalAmount))
+		},
+	}
+
 	numberOfCarsByBrand.Flags().StringVarP(&brand, "brand", "b", "", "Get the number of cars by brand")
 	listCarsByBrand.Flags().StringVarP(&brand, "brand", "b", "", "List the cars by brand")
 	listCarsByMileageRange.Flags().IntVar(&min, "min", -1, "Minimun mileage")
 	listCarsByMileageRange.Flags().IntVar(&max, "max", -1, "Maximum mileage")
+	getDealershipTotalAmount.Flags().StringVarP(&dealership, "dealership", "d", "", "Get the total amount of the cars given a dealership")
 
 	rootCmd.AddCommand(numberOfCarsByBrand)
 	rootCmd.AddCommand(listCarsByBrand)
 	rootCmd.AddCommand(listCarsByMileageRange)
+	rootCmd.AddCommand(getDealershipTotalAmount)
 	rootCmd.Execute()
 }
 
@@ -144,4 +161,16 @@ func getCarsByMileageRange(min, max int, cars []Car) []Car {
 	}
 
 	return filteredCars
+}
+
+func getTotalPriceByDealership(dealership string, cars []Car) int {
+	total := 0
+
+	for _, car := range cars {
+		if dealership == car.Dealership {
+			total += car.Price
+		}
+	}
+
+	return total
 }
