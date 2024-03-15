@@ -21,6 +21,7 @@ func main() {
 	}
 
 	var brand string
+	var min, max int
 
 	numberOfCarsByBrand := &cobra.Command{
 		Use:   "filter",
@@ -56,11 +57,29 @@ func main() {
 		},
 	}
 
+	listCarsByMileageRange := &cobra.Command{
+		Use:   "range",
+		Short: "List the cars by mileage range",
+		Run: func(cmd *cobra.Command, args []string) {
+			if min <= -1 || max <= -1 {
+				fmt.Println("The min and max cannot be empty!")
+				return
+			}
+
+			filteredCars := getCarsByMileageRange(min, max, cars)
+
+			printCarsList(filteredCars)
+		},
+	}
+
 	numberOfCarsByBrand.Flags().StringVarP(&brand, "brand", "b", "", "Get the number of cars by brand")
 	listCarsByBrand.Flags().StringVarP(&brand, "brand", "b", "", "List the cars by brand")
+	listCarsByMileageRange.Flags().IntVar(&min, "min", -1, "Minimun mileage")
+	listCarsByMileageRange.Flags().IntVar(&max, "max", -1, "Maximum mileage")
 
 	rootCmd.AddCommand(numberOfCarsByBrand)
 	rootCmd.AddCommand(listCarsByBrand)
+	rootCmd.AddCommand(listCarsByMileageRange)
 	rootCmd.Execute()
 }
 
@@ -108,6 +127,18 @@ func getCarsByBrand(brand string, cars []Car) []Car {
 
 	for _, car := range cars {
 		if car.Brand == brand {
+			filteredCars = append(filteredCars, car)
+		}
+	}
+
+	return filteredCars
+}
+
+func getCarsByMileageRange(min, max int, cars []Car) []Car {
+	var filteredCars []Car
+
+	for _, car := range cars {
+		if car.Kilometers <= max && car.Kilometers >= min {
 			filteredCars = append(filteredCars, car)
 		}
 	}
