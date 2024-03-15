@@ -40,3 +40,17 @@ func printCarsList(cars []Car) {
 
 	w.Flush()
 }
+
+func formatCurrency(num int) string {
+	numStr := fmt.Sprintf("%d", num)
+	var formattedNum string
+
+	for i, digit := range numStr {
+		if i > 0 && (len(numStr)-i)%3 == 0 {
+			formattedNum += ","
+		}
+		formattedNum += string(digit)
+	}
+
+	return "$" + formattedNum
+}
